@@ -1,3 +1,14 @@
+"""Sudoku
+Definitions:
+    row: horizontal rows in the sudoku board
+    col: vertical columns in the sudoku board
+    block: 3 x 3 grid in sudoku board
+    peers: all other known values in the same row, col or block
+    board: the sudoku board
+    empty: a cell without a value (0 or any other value which is False)
+"""
+
+
 def solve(board):
     "Returns the solved sudoku board, not all boards are solvable"
     next_empty = _next_empty(board)
@@ -5,9 +16,7 @@ def solve(board):
         return board
 
     row, col = next_empty
-    peers = (set(_row(board, row, col))
-             | set(_col(board, row, col))
-             | set(_block(board, row, col)))
+    peers = _row(board, row) | _col(board, col) | _block(board, row, col)
     for guess in range(1, 10):
         if guess not in peers:
             board[row][col] = guess
@@ -15,6 +24,7 @@ def solve(board):
             if solution:
                 return solution
     board[row][col] = 0
+    return None
 
 
 def _next_empty(board):
@@ -26,21 +36,21 @@ def _next_empty(board):
     return None
 
 
-def _row(board, row, col):
-    "Returns a list of all items in the same row as the given position."
-    return board[row]
+def _row(board, row):
+    "Returns the set of all known values in the given row."
+    return {item for item in board[row] if item}
 
 
-def _col(board, row, col):
-    "Returns a list of all items in the same column as the given position."
-    return [row[col] for row in board]
+def _col(board, col):
+    "Returns the set of all known values in the given column."
+    return {row[col] for row in board if row[col]}
 
 
 def _block(board, row, col):
-    "Returns a list of all items in the same block as the given position."
+    "Returns the set of all known values in the given block."
     rows = range((row // 3) * 3, (row // 3) * 3 + 3)
     cols = range((col // 3) * 3, (col // 3) * 3 + 3)
-    return [board[row][col] for row in rows for col in cols]
+    return {board[row][col] for row in rows for col in cols if board[row][col]}
 
 
 if __name__ == '__main__':
